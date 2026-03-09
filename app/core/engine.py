@@ -72,9 +72,12 @@ class RulesEngine:
 
     @staticmethod
     def _check_condition(condition: Condition, profile: dict[str, Any]) -> bool:
-        value = profile.get(condition.field)
-        if value is None:
-            return False
+        if condition.field not in profile:
+            raise ValueError(
+                f"Profile is missing required field '{condition.field}' "
+                f"referenced by condition: {condition.reason}"
+            )
+        value = profile[condition.field]
 
         op = condition.operator
         expected = condition.value

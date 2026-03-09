@@ -19,3 +19,5 @@ async def evaluate(
             status_code=404,
             detail=f"Unknown pet type: {request.pet_type}",
         )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))

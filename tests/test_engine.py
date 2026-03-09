@@ -45,7 +45,15 @@ class TestCheckCondition:
 
     def test_missing_field(self, cond: dict) -> None:
         c = Condition(**cond, operator="gte", value=10)
-        assert RulesEngine._check_condition(c, {}) is False
+        with pytest.raises(ValueError, match="missing required field 'value'"):
+            RulesEngine._check_condition(c, {})
+
+    def test_falsy_field_values(self, cond: dict) -> None:
+        c_eq_false = Condition(**cond, operator="eq", value=False)
+        assert RulesEngine._check_condition(c_eq_false, {"value": False}) is True
+
+        c_eq_zero = Condition(**cond, operator="eq", value=0)
+        assert RulesEngine._check_condition(c_eq_zero, {"value": 0}) is True
 
 
 class TestRiskLevel:
@@ -63,7 +71,7 @@ class TestRiskLevel:
 
 class TestEvaluate:
     def test_missing_profile_field(self, engine: RulesEngine) -> None:
-        """Fields not in the profile should be treated as violated conditions."""
+        """Fields not in the profile should raise ValueError."""
         request = EvaluateRequest(
             pet_type="dog",
             housing="house",
@@ -76,4 +84,5 @@ class TestEvaluate:
         del profile["hours_free_per_day"]
 
         cond = engine.rules.pets["dog"].conditions[1]  # hours_free_per_day condition
-        assert RulesEngine._check_condition(cond, profile) is False
+        with pytest.raises(ValueError, match="missing required field"):
+            RulesEngine._check_condition(cond, profile)
