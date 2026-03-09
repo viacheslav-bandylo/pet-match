@@ -1,0 +1,71 @@
+version: "1.0.0"
+
+pets:
+  dog:
+    label: "Собака"
+    group: domestic
+    conditions:
+      - field: budget_usd
+        operator: gte
+        value: 200
+        risk_weight: 3
+        reason: "Собака требует от $200/мес на питание и ветеринара"
+      - field: hours_free_per_day
+        operator: gte
+        value: 3
+        risk_weight: 4
+        reason: "Собака требует минимум 3 часа внимания в день"
+      - field: housing
+        operator: in
+        value: ["house", "apartment_with_yard"]
+        risk_weight: 2
+        reason: "Собакам нужно пространство — дом или квартира с двором"
+    alternatives_if_rejected: [cat, hamster]
+
+  cat:
+    label: "Кошка"
+    group: domestic
+    conditions:
+      - field: budget_usd
+        operator: gte
+        value: 80
+        risk_weight: 2
+        reason: "Кошка требует от $80/мес на питание и уход"
+      - field: hours_free_per_day
+        operator: gte
+        value: 1
+        risk_weight: 1
+        reason: "Кошке нужно минимум 1 час внимания в день"
+      - field: has_children
+        operator: eq
+        value: false
+        risk_weight: 1
+        reason: "Некоторые кошки плохо уживаются с маленькими детьми"
+    alternatives_if_rejected: [hamster, fish]
+
+  hamster:
+    label: "Хомяк"
+    group: small
+    conditions:
+      - field: budget_usd
+        operator: gte
+        value: 20
+        risk_weight: 1
+        reason: "Минимальный бюджет для хомяка — $20/мес"
+      - field: hours_free_per_day
+        operator: gte
+        value: 0.5
+        risk_weight: 1
+        reason: "Хомяку нужно минимум 30 минут внимания в день"
+    alternatives_if_rejected: [fish]
+
+  fish:
+    label: "Рыбка"
+    group: aquatic
+    conditions:
+      - field: budget_usd
+        operator: gte
+        value: 30
+        risk_weight: 1
+        reason: "Аквариум и содержание рыбок требуют от $30/мес"
+    alternatives_if_rejected: [hamster]
